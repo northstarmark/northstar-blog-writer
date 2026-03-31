@@ -1,0 +1,329 @@
+<div id="ns-blog-writer-root"></div>
+<script>
+(function() {
+
+  // ── YOUR API KEY ──
+  var API_KEY = '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';
+
+  // ── STYLES ──
+  var style = document.createElement('style');
+  style.textContent = [
+    '#ns-blog-writer-root * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }',
+    '#ns-wrap { display: flex; min-height: 600px; border: 1px solid #DDE2F5; border-radius: 12px; overflow: hidden; background: #F4F6FF; }',
+    '#ns-nav { background: #0A0F2C; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; border-radius: 12px 12px 0 0; }',
+    '#ns-nav-name { color: #fff; font-size: 14px; font-weight: 700; }',
+    '#ns-nav-sub { color: #00C2FF; font-size: 11px; margin-top: 2px; }',
+    '#ns-nav-badge { background: rgba(0,194,255,0.15); color: #00C2FF; font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(0,194,255,0.3); }',
+    '#ns-left { background: #fff; width: 360px; min-width: 360px; padding: 20px; border-right: 1px solid #DDE2F5; display: flex; flex-direction: column; gap: 16px; }',
+    '#ns-right { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 14px; }',
+    '.ns-label { font-size: 11px; font-weight: 700; color: #0A0F2C; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px; }',
+    '.ns-hint { font-size: 11px; color: #9CA3AF; margin-bottom: 6px; }',
+    '.ns-input { width: 100%; font-family: Arial, sans-serif; font-size: 13px; color: #111827; background: #F4F6FF; border: 1.5px solid #DDE2F5; border-radius: 8px; padding: 10px 12px; outline: none; resize: none; line-height: 1.5; }',
+    '.ns-chips { display: flex; flex-wrap: wrap; gap: 6px; }',
+    '.ns-chip { font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 20px; border: 1.5px solid #DDE2F5; background: #fff; color: #6B7280; cursor: pointer; user-select: none; }',
+    '.ns-chip.on { background: #0038FF; border-color: #0038FF; color: #fff; }',
+    '#ns-write-btn { width: 100%; background: #0038FF; color: #fff; border: none; border-radius: 10px; padding: 14px; font-family: Arial, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 4px; }',
+    '#ns-write-btn:disabled { background: #9CA3AF; cursor: not-allowed; }',
+    '#ns-error { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #DC2626; display: none; }',
+    '#ns-empty { background: #fff; border: 1px solid #DDE2F5; border-radius: 12px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 40px; text-align: center; }',
+    '#ns-empty-title { font-size: 18px; font-weight: 700; color: #0A0F2C; }',
+    '#ns-empty-sub { font-size: 12px; color: #9CA3AF; max-width: 280px; line-height: 1.6; }',
+    '#ns-loading { background: #fff; border: 1px solid #DDE2F5; border-radius: 12px; flex: 1; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 40px; text-align: center; }',
+    '#ns-loading-title { font-size: 16px; font-weight: 700; color: #0A0F2C; }',
+    '#ns-loading-sub { font-size: 12px; color: #9CA3AF; }',
+    '#ns-dots { display: flex; gap: 6px; }',
+    '.ns-dot { width: 8px; height: 8px; background: #0038FF; border-radius: 50%; animation: ns-bounce 1.2s ease-in-out infinite; }',
+    '.ns-dot:nth-child(2) { animation-delay: 0.2s; }',
+    '.ns-dot:nth-child(3) { animation-delay: 0.4s; }',
+    '@keyframes ns-bounce { 0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1} }',
+    '#ns-output { display: none; flex-direction: column; gap: 14px; flex: 1; }',
+    '#ns-action-row { display: flex; align-items: center; justify-content: space-between; }',
+    '#ns-action-row span { font-size: 11px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.06em; }',
+    '.ns-btn { font-family: Arial, sans-serif; font-size: 12px; font-weight: 600; padding: 7px 14px; border-radius: 7px; border: 1.5px solid #DDE2F5; background: #fff; color: #0A0F2C; cursor: pointer; }',
+    '.ns-btn.primary { background: #0A0F2C; border-color: #0A0F2C; color: #fff; }',
+    '#ns-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }',
+    '.ns-stat { background: #fff; border: 1px solid #DDE2F5; border-radius: 8px; padding: 10px; text-align: center; }',
+    '.ns-stat-val { font-size: 18px; font-weight: 700; color: #0038FF; }',
+    '.ns-stat-lbl { font-size: 10px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }',
+    '#ns-post-card { background: #fff; border: 1px solid #DDE2F5; border-radius: 12px; overflow: hidden; }',
+    '#ns-post-header { background: #0A0F2C; padding: 18px 22px; }',
+    '#ns-post-cat { font-size: 10px; font-weight: 700; color: #00C2FF; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }',
+    '#ns-post-title { font-size: 19px; font-weight: 700; color: #fff; line-height: 1.3; }',
+    '#ns-post-meta { display: flex; gap: 14px; margin-top: 8px; }',
+    '#ns-post-meta span { font-size: 11px; color: rgba(255,255,255,0.45); }',
+    '#ns-post-body { padding: 22px; max-height: 380px; overflow-y: auto; font-size: 14px; line-height: 1.75; color: #111827; }',
+    '#ns-post-body h2 { font-size: 16px; font-weight: 700; color: #0A0F2C; margin: 18px 0 8px; }',
+    '#ns-post-body p { margin-bottom: 12px; }',
+    '#ns-post-body .ns-cta { background: #F4F6FF; border-left: 3px solid #0038FF; border-radius: 0 8px 8px 0; padding: 14px 18px; margin-top: 18px; font-size: 13px; color: #0A0F2C; }',
+    '#ns-seo { background: #fff; border: 1px solid #DDE2F5; border-radius: 10px; padding: 14px 18px; }',
+    '#ns-seo-title { font-size: 11px; font-weight: 700; color: #0A0F2C; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }',
+    '#ns-seo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }',
+    '.ns-seo-item { background: #F4F6FF; border-radius: 7px; padding: 9px 11px; }',
+    '.ns-seo-lbl { font-size: 10px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }',
+    '.ns-seo-val { font-size: 12px; color: #111827; font-weight: 600; line-height: 1.4; }'
+  ].join('\n');
+  document.head.appendChild(style);
+
+  // ── BUILD HTML ──
+  var root = document.getElementById('ns-blog-writer-root');
+  root.innerHTML = [
+    '<div id="ns-nav">',
+    '  <div>',
+    '    <div id="ns-nav-name">Northstar AI Automation</div>',
+    '    <div id="ns-nav-sub">Blog Writer &middot; Phase 1</div>',
+    '  </div>',
+    '  <div id="ns-nav-badge">Northern Wisconsin Focus</div>',
+    '</div>',
+    '<div id="ns-wrap">',
+
+    // LEFT
+    '<div id="ns-left">',
+    '  <div style="font-size:18px;font-weight:700;color:#0A0F2C;">Write a blog post</div>',
+    '  <div>',
+    '    <span class="ns-label">Blog topic</span>',
+    '    <div class="ns-hint">Be specific &mdash; the more detail the better.</div>',
+    '    <textarea id="ns-topic" class="ns-input" rows="3" placeholder="e.g. How Manitowoc restaurants can use AI to handle after-hours calls"></textarea>',
+    '  </div>',
+    '  <div>',
+    '    <span class="ns-label">Target keyword (SEO)</span>',
+    '    <div class="ns-hint">The phrase you want to rank for in Google.</div>',
+    '    <input id="ns-keyword" class="ns-input" type="text" placeholder="e.g. AI for small businesses Wisconsin">',
+    '  </div>',
+    '  <div>',
+    '    <span class="ns-label">Local angle (optional)</span>',
+    '    <div class="ns-hint">City, industry, or business type.</div>',
+    '    <input id="ns-local" class="ns-input" type="text" placeholder="e.g. Two Rivers, Manitowoc, restaurants...">',
+    '  </div>',
+    '  <div>',
+    '    <span class="ns-label">Extra notes (optional)</span>',
+    '    <div class="ns-hint">Specific points or stats to include.</div>',
+    '    <textarea id="ns-notes" class="ns-input" rows="2" placeholder="e.g. Mention missed calls cost $1,000+/month"></textarea>',
+    '  </div>',
+    '  <div>',
+    '    <span class="ns-label">Tone</span>',
+    '    <div class="ns-chips" id="ns-chips">',
+    '      <div class="ns-chip on" data-tone="Conversational">Conversational</div>',
+    '      <div class="ns-chip on" data-tone="Friendly">Friendly</div>',
+    '      <div class="ns-chip" data-tone="Urgent">Urgent</div>',
+    '      <div class="ns-chip" data-tone="Data-driven">Data-driven</div>',
+    '      <div class="ns-chip" data-tone="Story-led">Story-led</div>',
+    '    </div>',
+    '  </div>',
+    '  <div id="ns-error"></div>',
+    '  <button id="ns-write-btn">Write this post</button>',
+    '</div>',
+
+    // RIGHT
+    '<div id="ns-right">',
+    '  <div id="ns-empty">',
+    '    <div id="ns-empty-title">Your post will appear here</div>',
+    '    <div id="ns-empty-sub">Fill in the topic and click Write. Takes about 20 seconds.</div>',
+    '  </div>',
+    '  <div id="ns-loading">',
+    '    <div id="ns-dots"><div class="ns-dot"></div><div class="ns-dot"></div><div class="ns-dot"></div></div>',
+    '    <div id="ns-loading-title">Writing your post...</div>',
+    '    <div id="ns-loading-sub">Crafting your Northstar-branded post. About 20 seconds.</div>',
+    '  </div>',
+    '  <div id="ns-output">',
+    '    <div id="ns-action-row">',
+    '      <span>Generated post</span>',
+    '      <div style="display:flex;gap:8px;">',
+    '        <button class="ns-btn" id="ns-regen-btn">Regenerate</button>',
+    '        <button class="ns-btn" id="ns-copy-btn">Copy text</button>',
+    '        <button class="ns-btn primary" id="ns-copyhl-btn">Copy for HighLevel</button>',
+    '      </div>',
+    '    </div>',
+    '    <div id="ns-stats">',
+    '      <div class="ns-stat"><div class="ns-stat-val" id="ns-words">-</div><div class="ns-stat-lbl">Words</div></div>',
+    '      <div class="ns-stat"><div class="ns-stat-val" id="ns-readtime">-</div><div class="ns-stat-lbl">Read time</div></div>',
+    '      <div class="ns-stat"><div class="ns-stat-val" id="ns-sections">-</div><div class="ns-stat-lbl">Sections</div></div>',
+    '      <div class="ns-stat"><div class="ns-stat-val" id="ns-seo-score">-</div><div class="ns-stat-lbl">SEO</div></div>',
+    '    </div>',
+    '    <div id="ns-post-card">',
+    '      <div id="ns-post-header">',
+    '        <div id="ns-post-cat">AI for Business</div>',
+    '        <div id="ns-post-title">-</div>',
+    '        <div id="ns-post-meta">',
+    '          <span>Northstar AI Automation</span>',
+    '          <span id="ns-post-date">-</span>',
+    '          <span id="ns-post-rt">-</span>',
+    '        </div>',
+    '      </div>',
+    '      <div id="ns-post-body"></div>',
+    '    </div>',
+    '    <div id="ns-seo">',
+    '      <div id="ns-seo-title">SEO Snapshot</div>',
+    '      <div id="ns-seo-grid">',
+    '        <div class="ns-seo-item"><div class="ns-seo-lbl">Meta description</div><div class="ns-seo-val" id="ns-meta">-</div></div>',
+    '        <div class="ns-seo-item"><div class="ns-seo-lbl">Suggested slug</div><div class="ns-seo-val" id="ns-slug">-</div></div>',
+    '        <div class="ns-seo-item"><div class="ns-seo-lbl">Primary keyword</div><div class="ns-seo-val" id="ns-primary">-</div></div>',
+    '        <div class="ns-seo-item"><div class="ns-seo-lbl">Related keywords</div><div class="ns-seo-val" id="ns-related">-</div></div>',
+    '      </div>',
+    '    </div>',
+    '  </div>',
+    '</div>',
+    '</div>'
+  ].join('');
+
+  // ── SYSTEM PROMPT ──
+  var SYSTEM = 'You are the official blog writer for Northstar AI Automation, a local AI and automation agency based in Two Rivers, Wisconsin (serving Two Rivers, Manitowoc, Green Bay, and Northern Wisconsin).\n\nBRAND VOICE:\n- Conversational and friendly. Write like a helpful neighbor who knows AI, not a tech salesperson.\n- Make AI feel simple and accessible to everyday business owners.\n- Never use jargon without immediately explaining it in plain English.\n- Always connect national trends back to Northern Wisconsin businesses.\n- Short sentences. 8th grade reading level. Use "you" and "your business" often.\n\nAUDIENCE: Small business owners, service businesses (restaurants, salons, contractors), Northern Wisconsin community.\n\nPOST STRUCTURE:\n1. Punchy headline (10 words max, include keyword)\n2. Hook paragraph - relatable local scenario, no "In today\'s world" openers\n3. The Problem - 1-2 short paragraphs\n4. The Solution - 2-3 paragraphs with a real example\n5. The Local Angle - tie to Northern Wisconsin specifically\n6. Quick Win - one easy action to take today\n7. CTA - mention northstaraiautomation.com and 920-920-7356\n\nLENGTH: 600-800 words.\n\nRETURN ONLY THIS JSON - no markdown, no extra text:\n{"headline":"...","category":"...","sections":[{"type":"p","text":"..."},{"type":"h2","text":"..."},{"type":"cta","text":"..."}],"wordCount":000,"metaDescription":"...","slug":"...","relatedKeywords":"..."}';
+
+  // ── STATE ──
+  var lastPost = null;
+
+  // ── HELPERS ──
+  function el(id) { return document.getElementById(id); }
+  function show(id) { el(id).style.display = 'flex'; }
+  function hide(id) { el(id).style.display = 'none'; }
+  function setText(id, val) { el(id).textContent = val; }
+
+  function showError(msg) {
+    var e = el('ns-error');
+    e.textContent = msg;
+    e.style.display = 'block';
+  }
+  function hideError() { el('ns-error').style.display = 'none'; }
+
+  function getTones() {
+    var active = [];
+    document.querySelectorAll('.ns-chip.on').forEach(function(c) { active.push(c.getAttribute('data-tone')); });
+    return active.join(', ');
+  }
+
+  // ── TONE CHIPS ──
+  document.querySelectorAll('.ns-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      this.classList.toggle('on');
+    });
+  });
+
+  // ── WRITE FUNCTION ──
+  function write() {
+    var topic   = el('ns-topic').value.trim();
+    var keyword = el('ns-keyword').value.trim();
+    var local   = el('ns-local').value.trim();
+    var notes   = el('ns-notes').value.trim();
+    var tones   = getTones();
+
+    if (!topic) { showError('Please enter a blog topic.'); return; }
+    hideError();
+
+    // Show loading
+    el('ns-write-btn').disabled = true;
+    el('ns-write-btn').textContent = 'Writing...';
+    hide('ns-empty');
+    hide('ns-output');
+    el('ns-loading').style.display = 'flex';
+
+    // Rotate loading messages
+    var msgs = ['Writing your post...','Adding the Wisconsin angle...','Polishing the headline...','Almost ready...'];
+    var mi = 0;
+    var mt = setInterval(function() {
+      mi = Math.min(mi + 1, msgs.length - 1);
+      setText('ns-loading-title', msgs[mi]);
+    }, 4000);
+
+    var userMsg = 'Write a blog post.\nTOPIC: ' + topic + '\nKEYWORD: ' + (keyword || 'AI for small business Wisconsin') + '\nLOCAL: ' + (local || 'Northern Wisconsin, Two Rivers, Manitowoc') + '\nNOTES: ' + (notes || 'None') + '\nTONE: ' + tones + '\nReturn only valid JSON.';
+
+    fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM,
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    })
+    .then(function(res) {
+      if (!res.ok) return res.json().then(function(e) { throw new Error(e.error && e.error.message ? e.error.message : 'API error ' + res.status); });
+      return res.json();
+    })
+    .then(function(data) {
+      clearInterval(mt);
+      var raw = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : '';
+      var clean = raw.replace(/```json|```/g, '').trim();
+      var post = JSON.parse(clean);
+      lastPost = post;
+      renderPost(post, keyword);
+    })
+    .catch(function(err) {
+      clearInterval(mt);
+      el('ns-loading').style.display = 'none';
+      show('ns-empty');
+      showError('Something went wrong: ' + err.message);
+    })
+    .finally(function() {
+      el('ns-write-btn').disabled = false;
+      el('ns-write-btn').textContent = 'Write this post';
+    });
+  }
+
+  // ── RENDER POST ──
+  function renderPost(post, keyword) {
+    el('ns-loading').style.display = 'none';
+
+    var wc = post.wordCount || post.sections.reduce(function(a, s) { return a + s.text.split(' ').length; }, 0);
+    var rt = Math.ceil(wc / 200);
+    var sc = post.sections.filter(function(s) { return s.type === 'h2'; }).length;
+    var seo = (keyword && post.sections.some(function(s) { return s.text.toLowerCase().indexOf(keyword.toLowerCase()) > -1; })) ? 'Good' : 'OK';
+
+    setText('ns-words', wc);
+    setText('ns-readtime', rt + ' min');
+    setText('ns-sections', sc);
+    setText('ns-seo-score', seo);
+    setText('ns-post-cat', post.category || 'AI for Business');
+    setText('ns-post-title', post.headline);
+    setText('ns-post-date', new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }));
+    setText('ns-post-rt', rt + ' min read');
+    setText('ns-meta', post.metaDescription || '-');
+    setText('ns-slug', post.slug || '-');
+    setText('ns-primary', keyword || '-');
+    setText('ns-related', post.relatedKeywords || '-');
+
+    // Build body HTML
+    var bodyHtml = post.sections.map(function(s) {
+      if (s.type === 'h2') return '<h2>' + s.text + '</h2>';
+      if (s.type === 'cta') return '<div class="ns-cta">' + s.text + '</div>';
+      return '<p>' + s.text + '</p>';
+    }).join('');
+    el('ns-post-body').innerHTML = bodyHtml;
+
+    el('ns-output').style.display = 'flex';
+  }
+
+  // ── COPY FUNCTIONS ──
+  function copyText() {
+    if (!lastPost) return;
+    var text = lastPost.headline + '\n\n' + lastPost.sections.map(function(s) { return s.text; }).join('\n\n');
+    navigator.clipboard.writeText(text).then(function() {
+      el('ns-copy-btn').textContent = 'Copied!';
+      setTimeout(function() { el('ns-copy-btn').textContent = 'Copy text'; }, 2000);
+    });
+  }
+
+  function copyHL() {
+    if (!lastPost) return;
+    var html = '<h1>' + lastPost.headline + '</h1>\n' + lastPost.sections.map(function(s) {
+      if (s.type === 'h2') return '<h2>' + s.text + '</h2>';
+      if (s.type === 'cta') return '<div style="background:#F4F6FF;border-left:3px solid #0038FF;padding:14px 18px;border-radius:0 8px 8px 0;margin-top:18px;">' + s.text + '</div>';
+      return '<p>' + s.text + '</p>';
+    }).join('\n');
+    navigator.clipboard.writeText(html).then(function() {
+      el('ns-copyhl-btn').textContent = 'Copied!';
+      setTimeout(function() { el('ns-copyhl-btn').textContent = 'Copy for HighLevel'; }, 2000);
+    });
+  }
+
+  // ── WIRE UP BUTTONS ──
+  el('ns-write-btn').addEventListener('click', write);
+  el('ns-regen-btn').addEventListener('click', write);
+  el('ns-copy-btn').addEventListener('click', copyText);
+  el('ns-copyhl-btn').addEventListener('click', copyHL);
+
+})();
+</script>
