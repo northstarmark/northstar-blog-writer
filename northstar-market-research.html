@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Market Research Tool — Northstar AI Automation</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #0038FF;
+    --navy: #0A0F2C;
+    --cyan: #00C2FF;
+    --blue-dim: #dde6ff;
+    --cyan-dim: #d9f5ff;
+    --green-dim: #e4f5e9;
+    --amber-dim: #fff4df;
+    --bg: #f4f5f8;
+    --surface: #ffffff;
+    --border: #e2e4ea;
+    --text: #0A0F2C;
+    --muted: #6b7280;
+    --success: #16a34a;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .wrap {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+    background: var(--navy);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .brand-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1.2;
+  }
+
+  .brand-sub {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .api-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  .api-pill input {
+    border: none;
+    outline: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    width: 200px;
+    background: transparent;
+  }
+
+  .api-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d1d5db;
+    flex-shrink: 0;
+    transition: background .3s;
+  }
+  .api-dot.active { background: var(--success); }
+
+  /* Hero input */
+  .hero {
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .hero p {
+    font-size: 14px;
+    color: rgba(255,255,255,.55);
+    margin-bottom: 1.25rem;
+  }
+
+  .search-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .search-row input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color .2s;
+  }
+
+  .search-row input::placeholder { color: rgba(255,255,255,.35); }
+  .search-row input:focus { border-color: var(--cyan); }
+
+  .run-btn {
+    padding: 12px 24px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity .15s, transform .1s;
+  }
+  .run-btn:hover { opacity: .88; }
+  .run-btn:active { transform: scale(.98); }
+  .run-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* Progress */
+  .progress-bar-wrap {
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transition: opacity .3s;
+  }
+  .progress-bar-wrap.visible { opacity: 1; }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--cyan));
+    border-radius: 99px;
+    width: 0%;
+    transition: width .5s ease;
+  }
+
+  .status-line {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+    min-height: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin .65s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Section cards */
+  .sections { display: flex; flex-direction: column; gap: 14px; }
+
+  .section-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  .section-card.visible { opacity: 1; transform: none; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .ic-industry { background: var(--blue-dim); }
+  .ic-trends   { background: var(--cyan-dim); }
+  .ic-audience { background: var(--green-dim); }
+  .ic-local    { background: var(--amber-dim); }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .copy-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: background .15s;
+  }
+  .copy-btn:hover { background: var(--bg); }
+  .copy-btn.copied { color: var(--success); border-color: #bbf7d0; }
+
+  .section-body {
+    padding: 16px 18px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    min-height: 60px;
+  }
+  .section-body.waiting { color: var(--muted); font-style: italic; }
+
+  /* Export */
+  .export-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .export-btn {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 500;
+    transition: background .15s;
+  }
+  .export-btn:hover { background: var(--bg); }
+  .export-btn.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .export-btn.primary:hover { opacity: .85; }
+
+  .hidden { display: none !important; }
+
+  /* Error banner */
+  .error-banner {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #b91c1c;
+    margin-bottom: 1rem;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    font-size: 12px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <polygon points="12,3 21,19 3,19" fill="none" stroke="#00C2FF" stroke-width="2.2" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="2.5" fill="#0038FF"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Northstar AI Automation</div>
+        <div class="brand-sub">Market Research Tool</div>
+      </div>
+    </div>
+    <div class="api-pill">
+      <div class="api-dot" id="apiDot"></div>
+      <input type="password" id="apiKeyInput" placeholder="Paste Anthropic API key" oninput="handleKeyInput()" />
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>Research Any Market</h1>
+    <p>Enter a topic, niche, or business type and get a full AI-powered market research report in under a minute.</p>
+    <div class="search-row">
+      <input type="text" id="topicInput" placeholder="e.g. AI automation for restaurants in Wisconsin" />
+      <button class="run-btn" id="runBtn" onclick="runResearch()">Run Research →</button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-banner hidden" id="errorBanner"></div>
+
+  <!-- Progress -->
+  <div class="progress-bar-wrap" id="progressWrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="status-line" id="statusLine"></div>
+
+  <!-- Results -->
+  <div class="sections" id="sectionsArea">
+    <div class="section-card" id="card-industry">
+      <div class="section-header">
+        <div class="section-icon ic-industry">🏭</div>
+        <span class="section-label">Industry &amp; Competitor Overview</span>
+        <button class="copy-btn" id="copy-industry" onclick="copySection('industry')">Copy</button>
+      </div>
+      <div class="section-body waiting" id="body-industry">Results will appear here...</div>
+    </div>
+    <div class="section-card" id="card-trends">
+      <div class="section-header">
+        <div class="section-icon ic-trends">📈</div>
+        <span class="section-label">Trending Topics &amp; Keywords</span>
+        <button class="copy-btn" id="copy-trends" onclick="copySection('trends')">Copy</button>
+      </div>
+      <div class="section-body waiting" id="body-trends">Results will appear here...</div>
+    </div>
+    <div class="section-card" id="card-audience">
+      <div class="section-header">
+        <div class="section-icon ic-audience">👥</div>
+        <span class="section-label">Target Audience Insights</span>
+        <button class="copy-btn" id="copy-audience" onclick="copySection('audience')">Copy</button>
+      </div>
+      <div class="section-body waiting" id="body-audience">Results will appear here...</div>
+    </div>
+    <div class="section-card" id="card-local">
+      <div class="section-header">
+        <div class="section-icon ic-local">📍</div>
+        <span class="section-label">Local Market Angle — NE Wisconsin</span>
+        <button class="copy-btn" id="copy-local" onclick="copySection('local')">Copy</button>
+      </div>
+      <div class="section-body waiting" id="body-local">Results will appear here...</div>
+    </div>
+  </div>
+
+  <!-- Export row (hidden until done) -->
+  <div class="export-row hidden" id="exportRow">
+    <button class="export-btn" onclick="copyAll()">📋 Copy full report</button>
+    <button class="export-btn primary" onclick="downloadReport()">⬇ Download as .txt</button>
+  </div>
+
+  <footer>Northstar AI Automation &nbsp;·&nbsp; northstaraiautomation.com</footer>
+
+</div>
+
+<script>
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const sections = ['industry','trends','audience','local'];
+const sectionData = {};
+let apiKey = '';
+
+function handleKeyInput() {
+  apiKey = document.getElementById('apiKeyInput').value.trim();
+  document.getElementById('apiDot').classList.toggle('active', apiKey.length > 20);
+}
+
+const prompts = {
+  industry: t => `Market research for: "${t}". In 4 bullet points cover: top competitors, market size/growth, main challenges, and how businesses differentiate. Be brief and specific.`,
+  trends: t => `Trending topics and keywords for: "${t}". List 6-8 top search keywords, then 3 bullet points on emerging trends and popular content formats. Be brief.`,
+  audience: t => `Target audience profile for: "${t}". In 4 bullet points cover: demographics, key pain points, how they find solutions, and what they value in a provider. Be brief.`,
+  local: t => `Local market analysis for: "${t}" in Northeast Wisconsin (Two Rivers, Manitowoc, Sheboygan, Green Bay). In 4 bullet points cover: local competition, regional factors, how it differs from national trends, and opportunities for a local provider. Be brief.`
+};
+
+const statusLabels = [
+  'Analyzing industry landscape...',
+  'Identifying trending keywords...',
+  'Profiling target audience...',
+  'Mapping local market opportunity...'
+];
+
+const sectionLabels = {
+  industry: 'Industry & Competitor Overview',
+  trends: 'Trending Topics & Keywords',
+  audience: 'Target Audience Insights',
+  local: 'Local Market Angle — NE Wisconsin'
+};
+
+async function runResearch() {
+  const topic = document.getElementById('topicInput').value.trim();
+  const errorBanner = document.getElementById('errorBanner');
+
+  errorBanner.classList.add('hidden');
+
+  if (!topic) {
+    showError('Please enter a research topic.');
+    return;
+  }
+  if (!apiKey) {
+    showError('Please paste your Anthropic API key in the top-right field.');
+    return;
+  }
+
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true;
+
+  // Reset
+  sections.forEach(s => {
+    sectionData[s] = '';
+    const body = document.getElementById('body-'+s);
+    body.textContent = 'Researching...';
+    body.classList.add('waiting');
+    document.getElementById('card-'+s).classList.remove('visible');
+    document.getElementById('copy-'+s).textContent = 'Copy';
+    document.getElementById('copy-'+s).classList.remove('copied');
+  });
+  document.getElementById('exportRow').classList.add('hidden');
+
+  const progressWrap = document.getElementById('progressWrap');
+  const progressBar = document.getElementById('progressBar');
+  progressWrap.classList.add('visible');
+  progressBar.style.width = '5%';
+
+  for (let i = 0; i < sections.length; i++) {
+    const s = sections[i];
+    setStatus(statusLabels[i]);
+    progressBar.style.width = (10 + i * 22) + '%';
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 400,
+          messages: [{ role: 'user', content: prompts[s](topic) }]
+        })
+      });
+
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+      sectionData[s] = text;
+    } catch(e) {
+      sectionData[s] = 'Error: ' + e.message;
+    }
+
+    const body = document.getElementById('body-'+s);
+    body.textContent = sectionData[s];
+    body.classList.remove('waiting');
+    document.getElementById('card-'+s).classList.add('visible');
+  }
+
+  progressBar.style.width = '100%';
+  setStatus('✓ Research complete.', true);
+  document.getElementById('exportRow').classList.remove('hidden');
+  btn.disabled = false;
+
+  setTimeout(() => { progressWrap.classList.remove('visible'); }, 1000);
+}
+
+function setStatus(msg, done = false) {
+  const el = document.getElementById('statusLine');
+  if (done) {
+    el.innerHTML = '<span style="color:var(--success);font-weight:500;">' + msg + '</span>';
+  } else {
+    el.innerHTML = '<div class="spinner"></div><span>' + msg + '</span>';
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBanner');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function copySection(s) {
+  if (!sectionData[s]) return;
+  navigator.clipboard.writeText(sectionData[s]).then(() => {
+    const btn = document.getElementById('copy-'+s);
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function copyAll() {
+  const topic = document.getElementById('topicInput').value.trim();
+  const lines = ['MARKET RESEARCH REPORT', 'Topic: ' + topic, 'Generated by Northstar AI Automation', '='.repeat(50), ''];
+  sections.forEach(s => {
+    lines.push('## ' + sectionLabels[s]);
+    lines.push('');
+    lines.push(sectionData[s] || '');
+    lines.push('');
+    lines.push('-'.repeat(50));
+    lines.push('');
+  });
+  navigator.clipboard.writeText(lines.join('\n'));
+}
+
+function downloadReport() {
+  const topic = document.getElementById('topicInput').value.trim();
+  const lines = ['MARKET RESEARCH REPORT', 'Topic: ' + topic, 'Generated by Northstar AI Automation', 'northstaraiautomation.com', '='.repeat(50), ''];
+  sections.forEach(s => {
+    lines.push('## ' + sectionLabels[s]);
+    lines.push('');
+    lines.push(sectionData[s] || '');
+    lines.push('');
+    lines.push('-'.repeat(50));
+    lines.push('');
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'market-research-' + topic.replace(/\s+/g,'-').toLowerCase().slice(0,40) + '.txt';
+  a.click();
+}
+
+document.getElementById('topicInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') runResearch();
+});
+</script>
+</body>
+</html>
